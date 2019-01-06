@@ -1,0 +1,167 @@
+{% extends "layout.html" %}
+{% block title %}Unsold Items{% endblock %}
+{% block head %}
+  {{ super() }}
+  <style type="text/css">
+    .important { color: #336699; }
+  </style>
+{% endblock %}
+{% block content %}
+  <!-- <h1>Login</h1> -->
+<!-- <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css"> -->
+<!-- <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script> -->
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+
+<!------ Include the above in your HEAD tag ---------->
+
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Web Crawler</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script> 
+  <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.5/socket.io.min.js">
+        </script>
+   <link rel="stylesheet" href="/static/css/style.css">
+  <script src="/static/js/index.js"></script>
+  <script src="/static/js/util.js"></script>
+  <script type="text/javascript">
+    var user_id = null;
+    var item_id = null;
+    user_id = '{{ user_id }}';
+    item_id = '{{ item_id }}';
+    console.log(user_id);
+    console.log(item_id);
+  
+    window.onload = function (){
+      // init_socket(item_id);
+      setTimeout(function(){ init_socket(item_id);
+      },10)
+    }
+  function init_socket(item_id){
+  console.log("in init_socket")
+  str_item_id = item_id
+  var my_room='ROOM-AUCTION-ITEM='+str_item_id;
+  var namespace="/sink_auction";
+  console.log(my_room)
+  mysocket = io.connect('http://127.0.0.1:8082'+namespace);
+  mysocket.on('connect', function(res) {
+        console.log("in connect")
+        console.log(my_room)
+        mysocket.emit('join', {room:my_room});                    
+
+  });
+  mysocket.io.timeout(1000);
+  mysocket.on('message', function(res) {
+        console.log("in message")
+        console.log("I am here")    
+        console.log(res);
+        mysocket.send('my_event', {data: 'I\'m connected1! and sending message'});
+        process_data(res)
+  });
+  function update_current_best_price(best_price,bidder){
+    console.log("best_price")
+    console.log(best_price[0])
+    console.log("bidder")
+    console.log(bidder)
+    $("#current_best_price").html("Current Best Price:-<b>"+best_price[0]+"</b> Bid By <b>"+bidder[0]+"</b>")
+  }
+  function announce_buyer(user_name){
+    alert("Hello There Buyer For Item Id "+item_id+" is "+user_name[0])
+    // var url = "/get_user_name/?user_id="+user_id
+    // $.getJSON(url,function(res){
+
+    // });
+  }
+  function process_data(data){                                               
+        var obj_data=JSON.parse(data);
+        var event_type=obj_data.data.split("|")[0]
+        // var args=obj_data.data.split("|").slice(1);
+        switch(event_type){
+            case "price_change":
+                //Update ui
+                // update_price_of_buyer();
+                break;
+            case "new_bid_init":
+              //enter dynamically
+                // make_new_entry()
+                break;
+            case "buyer_found":
+                // announce_buyer()
+                var buyer_name = obj_data.data.split("|").slice(4);
+                announce_buyer(buyer_name)
+                break;
+            case "current_best_price":
+                var best_price= obj_data.data.split("|").slice(3);
+                var best_price_bidder = obj_data.data.split("|").slice(4);
+                // console.log(best_price)
+                update_current_best_price(best_price,best_price_bidder);
+                break;
+                }
+            } 
+}
+    
+    $("body").on('click','#bid',function(){
+    var price = $("#bid_amount").val();
+    var url = "/bid"
+    var dataToBeSent = {"user_id":user_id,"item_id":item_id,"price":price}
+    $.post(url, dataToBeSent, function(data, textStatus) {
+    alert("Bid "+textStatus);
+    }, "json");
+    
+});
+    
+  </script>
+</head>
+<body>
+
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="#">Live Auction <span> </span> <a class="navbar-brand" href="/logout">Logout </a> <span> </span> <a  class="navbar-brand" href="/">Home </a>
+    </div>
+  </div>
+</nav>
+
+ <div class="container">  
+  <div class="panel panel-default">
+    <div class="panel-heading"></div>
+    <div class="panel-body">
+      <div class="row col-md-12">
+         <form class="form-horizontal" role="form">
+            <div class="form-group">
+                 <div class="col-md-12">
+                    <div class="form-group row">
+                        <label for="bid_amount" class="col-md-1 control-label">Bid Price</label>
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" id="bid_amount" placeholder="">
+                        </div>
+                        
+                        <div class="col-md-2 ">
+                            <button id="bid" type="button" class="btn btn-primary">Bid</button>
+                        </div>
+                        <div>
+                          <h4 id="current_best_price">Current Best Price:- </h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+      </div>
+     
+    </div>
+    
+    <div class="panel-footer"></div>
+  </div>
+</div> 
+
+
+
+</body>
+</html>
+
+        
+{% endblock %}

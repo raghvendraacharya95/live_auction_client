@@ -1,0 +1,81 @@
+{% extends "layout.html" %}
+{% block title %}Unsold Items{% endblock %}
+{% block head %}
+  {{ super() }}
+  <style type="text/css">
+    .important { color: #336699; }
+  </style>
+{% endblock %}
+{% block content %}
+  <!-- <h1>Login</h1> -->
+<link href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+
+<!------ Include the above in your HEAD tag ---------->
+
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Web Crawler</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script> 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap3-dialog/1.35.4/css/bootstrap-dialog.min.css"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap3-dialog/1.35.4/js/bootstrap-dialog.min.js"></script>
+  <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.5/socket.io.min.js">
+        </script>
+   <link rel="stylesheet" href="static/css/style.css">
+  <script src="static/js/index.js"></script>
+  <script src="static/js/util.js"></script>
+  <script type="text/javascript">
+  	$(document).ready(function() {
+    //ToDo Action  
+    // init()
+    var data = null;
+    var detail_url_path="/all_unsold_items_list";
+	$.getJSON(detail_url_path,function(response){
+		console.log(response)
+		data = response;
+		list = createAList(data);
+		setHtml("all_items",list)	
+	});
+    
+});
+  </script>
+</head>
+<body>
+
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="#">Live Auction <span> </span> <a class="navbar-brand" href="/logout">Logout </a> <span> </span> <a  class="navbar-brand" href="/">Home </a> <span> <a class="navbar-brand" href="/all_unsold_items">Get All Items On Auction </a></span></a>
+    </div>
+  </div>
+</nav>
+
+ <div class="container">  
+  <div class="panel panel-default">
+    <div class="panel-heading"></div>
+    <div class="panel-body">
+      <div class="row col-md-12">
+         
+      </div>
+      <div class="row col-md-12" id="all_items">
+      
+    </div>
+    </div>
+    
+    <div class="panel-footer"></div>
+  </div>
+</div> 
+
+
+
+</body>
+</html>
+
+        
+{% endblock %}
